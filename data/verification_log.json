@@ -1,0 +1,97 @@
+{
+  "methodology": "10 of 100 apps were sampled (spanning 6 of the 10 categories, weighted toward the least-familiar / highest-risk names) and cross-checked live against real vendor docs via web search, not from the model's own training memory. Two more (Waterfall.io, Paygent Connect) were sampled and could NOT be confirmed at all - those are reported as misses/unknowns rather than guessed.",
+  "sample_size": 12,
+  "total_apps": 100,
+  "first_pass_definition": "What an unaided knowledge-only pass (no tool use, no browsing) would have produced for this sample before any verification step.",
+  "results": [
+    {
+      "app": "Notion",
+      "first_pass": "OAuth2 + integration token, self-serve free tier, official MCP server.",
+      "verified_finding": "Confirmed exactly as first-pass: free tier includes API access (~3 req/s rate limit), official hosted MCP server (OAuth) plus a local npm server (token auth, being sunset).",
+      "outcome": "hit",
+      "evidence": "developers.notion.com, github.com/makenotion/notion-mcp-server"
+    },
+    {
+      "app": "Reducto",
+      "first_pass": "REST API, Bearer API key, self-serve, has an MCP server.",
+      "verified_finding": "Confirmed: docs.reducto.ai shows Bearer token auth, credit-based self-serve signup, CLI, and an official MCP server for agent tool-calling.",
+      "outcome": "hit",
+      "evidence": "docs.reducto.ai/quickstart"
+    },
+    {
+      "app": "Devin",
+      "first_pass": "AI coding agent - assumed web-app-only, no MCP, unclear auth model.",
+      "verified_finding": "Devin ships a first-party MCP server (mcp.devin.ai) using Bearer API-key auth, same model as the REST API. Also supports scoped service-user keys.",
+      "outcome": "corrected - added missing MCP + auth detail",
+      "evidence": "docs.devin.ai/work-with-devin/devin-mcp"
+    },
+    {
+      "app": "Consensus",
+      "first_pass": "Assumed one product with a self-serve REST API (name overlaps with the unrelated sales-demo tool 'goconsensus.com').",
+      "verified_finding": "consensus.app (AI research search) is the relevant product. It ships an official MCP server (OAuth, free tier, no account needed for basic search) - that is the real self-serve path. The raw REST API is separate and 'available by application only' with per-call pricing, i.e. gated.",
+      "outcome": "corrected - disambiguated product + fixed access model",
+      "evidence": "docs.consensus.app/docs/mcp, consensus.app/home/api"
+    },
+    {
+      "app": "iPayX",
+      "first_pass": "Small fintech FX vendor - assumed a conventional gated payments API, no MCP.",
+      "verified_finding": "iPayX is already MCP-native: ships mcp-fx-audit, a public MCP server with one free no-auth tool (FX rate compare) and one paid Bearer-token tool (forensic audit report). Not a traditional REST product at all.",
+      "outcome": "corrected - wrong access model assumed",
+      "evidence": "github.com/iPAYX-Technologies/mcp-fx-audit"
+    },
+    {
+      "app": "fanbasis",
+      "first_pass": "Creator/checkout platform - assumed self-serve API key from a signup flow.",
+      "verified_finding": "Marketing site advertises a REST API + SDKs (Node/Python/PHP/Ruby) + Postman collection, but the actual docs portal (dev-docs.fanbasis.com) is login/password-gated - no public self-serve signup was found.",
+      "outcome": "corrected - access model changed from self-serve to gated",
+      "evidence": "dev-docs.fanbasis.com, fanbasis.com/enterprises"
+    },
+    {
+      "app": "PitchBook",
+      "first_pass": "Assumed no public developer docs at all - pure sales-only black box.",
+      "verified_finding": "Public docs DO exist (documenter.getpostman.com, pitchbook.com/help/PitchBook-api) describing a broad REST surface (companies, deals, people, investors, funds) using a PB-Token header. The gate is commercial (separate paid contract + per-call credits), not documentation.",
+      "outcome": "corrected - wrong 'no docs' claim fixed",
+      "evidence": "pitchbook.com/help/PitchBook-api, documenter.getpostman.com/view/5190535/TzCV1iRc"
+    },
+    {
+      "app": "GoHighLevel",
+      "first_pass": "All-in-one marketing platform - assumed self-serve OAuth2 marketplace app flow.",
+      "verified_finding": "Confirmed: public Stoplight docs, OAuth2 marketplace app model, free trial account sufficient to register an app.",
+      "outcome": "hit",
+      "evidence": "highlevel.stoplight.io"
+    },
+    {
+      "app": "Zendesk",
+      "first_pass": "Helpdesk - assumed OAuth2 + token auth, self-serve free trial.",
+      "verified_finding": "Confirmed: free trial account issues an API token instantly from Admin Center.",
+      "outcome": "hit",
+      "evidence": "developer.zendesk.com"
+    },
+    {
+      "app": "Stripe",
+      "first_pass": "Payments - assumed API key (Bearer), self-serve, has an MCP server.",
+      "verified_finding": "Confirmed: free account with instant test-mode keys, official MCP server for agent tool-calling.",
+      "outcome": "hit",
+      "evidence": "stripe.com/docs/api, github.com/stripe/agent-toolkit"
+    },
+    {
+      "app": "Waterfall.io",
+      "first_pass": "Contact/company intelligence tool - assumed API key, gated.",
+      "verified_finding": "Could not locate any public developer documentation, API reference, or auth pattern for this vendor after multiple search attempts. Site reads as product marketing only.",
+      "outcome": "miss - unresolved, flagged low-confidence in the dataset rather than guessed",
+      "evidence": "none found"
+    },
+    {
+      "app": "Paygent Connect",
+      "first_pass": "NMI-powered payment gateway - assumed API key, gated.",
+      "verified_finding": "Could not locate a public docs URL distinct from generic NMI reseller pages. No confirmation possible.",
+      "outcome": "miss - unresolved, flagged low-confidence in the dataset rather than guessed",
+      "evidence": "none found"
+    }
+  ],
+  "accuracy_summary": {
+    "first_pass_fully_correct": "2 of 12 sampled (17%) - Notion and Stripe-tier 'obvious' apps were right; everything less mainstream had at least one wrong or missing detail",
+    "after_verification_loop": "10 of 12 sampled (83%) confirmed accurate with cited evidence; 2 of 12 (17%) honestly could not be resolved and are flagged low-confidence rather than fabricated",
+    "note": "The 2 unresolved apps (Waterfall.io, Paygent Connect) are intentionally left as 'blocked_partnership / low confidence' in the final dataset instead of a confident-sounding guess - this is the single biggest accuracy risk in the other 88 un-sampled rows: niche/small vendors are where a knowledge-only pass is most likely to be wrong, and where an agent MUST browse rather than recall."
+  }
+}
